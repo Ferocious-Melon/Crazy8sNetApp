@@ -5,8 +5,7 @@ import card
 player1 = 7
 player2 = 7
 
-turn2 = False
-turn1 = False
+turn = False
 
 deck = []
 hand1 = []
@@ -24,10 +23,10 @@ def game(): #Main game
     while runGame == True:
         goesFirst = random.randint(1, 10) #Decides who goes first
         if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
-            turn2 = True
+            turn = False
     
         else: #Any number (Less than 5) means it's player 1's turn
-            turn1 = True
+            turn = True
 
         #Call the shuffle function 3 times
         shuffle()
@@ -42,50 +41,48 @@ def game(): #Main game
         print("Card currently in play: ", cardInPlay)
         print("Number of cards your opponent has: ", len(hand2))
 
-        if turn1 = True:
+        if turn == True:
             print("Choose a card player1 (by index): ")
             for i in range(len(hand1)):
                 print("[" + i + "] ", hand1[i])
-                print(\n)
+                print("\n")
         
             choice = int(input())
             while not (choice in range(0,len(hand1)) and cardInPlay.compareCard(hand1[choice])):
                 print("Cannot play that card")
                 choice = input("Choose another (by index): ")
 
-            cardInPlay = hand1[hand1.pop(choice)]
+            cardInPlay = hand1.pop(choice)
             if len(hand1) == 0:
                 print("Congratulations! Player 1 has won the game!")
-            turn1 = False
-            turn2 = True
+            turn = False
 
 
         else:
             print("Choose a card player2 (by index): ")
             for i in range(len(hand2)):
                 print("[" + i + "] ", hand2[i])
-                print(\n)
+                print("\n")
             choice = int(input())
             while not (choice in range(0,len(hand2)) and cardInPlay.compareCard(hand2[choice])):
                 print("Cannot play that card")
                 choice = input("Choose another (by index): ") 
 
-            cardInPlay = hand2[hand2.pop(choice)]
+            cardInPlay = hand2.pop(choice)
             if len(hand2) == 0:
                 print("Congratulations! Player 2 has won the game!")
-            turn2 = False
-            turn1 = True
+            turn = True
 
         
 
 
 def shuffle(): #Shuffles the deck
     deckLen = len(deck)
-    for i in range(0, deckLen)
+    for i in range(0, deckLen):
         r = random.randint(0, deckLen)
         a[i], a[r] = a[r], a[i]
 
-def distribute(list[]):
+def distribute(list):
     for i in range(7):
         list[i]=deck.pop()
 
