@@ -20,7 +20,8 @@ for suit in suits: #Assign each symbol with numbers 1 - 13
         deck.append(card.card(suit,i)) #Create card, add to deck
 
 def game(): #Main game
-    while True:
+    runGame = True
+    while runGame == True:
         goesFirst = random.randint(1, 10) #Decides who goes first
         if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
             turn2 = True
@@ -53,6 +54,8 @@ def game(): #Main game
                 choice = input("Choose another (by index): ")
 
             cardInPlay = hand1[hand1.pop(choice)]
+            if len(hand1) == 0:
+                print("Congratulations! Player 1 has won the game!")
             turn1 = False
             turn2 = True
 
@@ -68,6 +71,8 @@ def game(): #Main game
                 choice = input("Choose another (by index): ") 
 
             cardInPlay = hand2[hand2.pop(choice)]
+            if len(hand2) == 0:
+                print("Congratulations! Player 2 has won the game!")
             turn2 = False
             turn1 = True
 
@@ -97,4 +102,3 @@ def distribute(list[]):
         
     
         
-
