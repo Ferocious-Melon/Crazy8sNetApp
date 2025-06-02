@@ -1,4 +1,5 @@
 import card
+import random
 
 #Player1
 #Player2
@@ -18,75 +19,115 @@ for suit in suits: #Assign each symbol with numbers 1 - 13
     for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
         deck.append(card.card(suit,i)) #Create card, add to deck
 
+
+
 def game(): #Main game
-    runGame = True
-    while runGame == True:
-        goesFirst = random.randint(1, 10) #Decides who goes first
-        if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
-            turn = False
     
-        else: #Any number (Less than 5) means it's player 1's turn
-            turn = True
+    runGame = True
 
-        #Call the shuffle function 3 times
-        shuffle()
-        shuffle()
-        shuffle()
+    goesFirst = random.randint(1, 10) #Decides who goes first
+    if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
+        turn = False
 
-        distribute(hand1)
-        distribute(hand2)
+    else: #Any number (Less than 5) means it's player 1's turn
+        turn = True
 
-        cardInPlay = deck[deck.pop()]
+    #Call the shuffle function 3 times
+    shuffle()
+    shuffle()
+    shuffle()
+
+    distribute(hand1)
+    distribute(hand2)
+
+    currentHand=None
+    cardInPlay = deck.pop()
+
+    while runGame == True:
 
         print("Card currently in play: ", cardInPlay)
         print("Number of cards your opponent has: ", len(hand2))
 
-        if turn == True:
-            print("Choose a card player1 (by index): ")
-            for i in range(len(hand1)):
-                print("[" + i + "] ", hand1[i])
+        currentHand = hand1 if turn else hand2
+        currPlayer = '1' if turn else '2'
+
+        print("Player ",currPlayer,"'s turn",sep="")
+        for i in range(len(currentHand)):
+                print("[", i, "] ", currentHand[i], sep="")
                 print("\n")
         
+        canPlay = False
+        for c in currentHand:
+            if(c.compare(cardInPlay) == True):
+                canPlay = True
+        if canPlay:
+            print("Choose a card (by index): ")
             choice = int(input())
-            while not (choice in range(0,len(hand1)) and cardInPlay.compareCard(hand1[choice])):
+            while not (choice in range(0,len(currentHand)) and cardInPlay.compare(currentHand[choice])):
                 print("Cannot play that card")
-                choice = input("Choose another (by index): ")
+                choice = int(input("Choose another (by index): "))
 
-            cardInPlay = hand1.pop(choice)
-            if len(hand1) == 0:
+            cardInPlay = currentHand.pop(choice)
+            
+            #Check for other cards available to play
+            possibleCards = []
+            for i in range(len(currentHand)):
+                if cardInPlay.num == currentHand[i].num:
+                    possibleCards.append(i)
+                    print("[", i, "] ", currentHand[i], sep="")
+                    print("\n")
+
+            while(len(possibleCards) != 0):
+                choice = int(input("Choose an index to play or another input to continue"))
+                if choice in possibleCards and cardInPlay.compare(currentHand[choice]):
+                    cardInPlay = currentHand.pop(choice)
+                    possibleCards.remove(choice)
+                    print("Card In Play", cardInPlay)
+                else:
+                    possibleCards.clear()
+
+            if len(currentHand) == 0:
                 print("Congratulations! Player 1 has won the game!")
-            turn = False
-
-
+                runGame = False
         else:
-            print("Choose a card player2 (by index): ")
-            for i in range(len(hand2)):
-                print("[" + i + "] ", hand2[i])
-                print("\n")
-            choice = int(input())
-            while not (choice in range(0,len(hand2)) and cardInPlay.compareCard(hand2[choice])):
-                print("Cannot play that card")
-                choice = input("Choose another (by index): ") 
+            newCard = deck.pop()
+            print("Card Drawn: ",newCard)
+            currentHand.append(newCard)
 
-            cardInPlay = hand2.pop(choice)
-            if len(hand2) == 0:
-                print("Congratulations! Player 2 has won the game!")
-            turn = True
+            if newCard.compare(cardInPlay):
+                toPlay = input("Do you want to play it? [y/n]: ")
+                while toPlay != "y" and toplay != "n":
+                    toPlay = input("Enter proper response: [y/n]: ")
+                if toPlay == "y":
+                    cardInPlay = currentHand.pop()
 
-        
+        input("Hit 'Enter' to continue.")
+        turn = not turn
+
 
 
 def shuffle(): #Shuffles the deck
     deckLen = len(deck)
     for i in range(0, deckLen):
-        r = random.randint(0, deckLen)
-        a[i], a[r] = a[r], a[i]
+        r = random.randint(0, deckLen-1)
+        deck[i], deck[r] = deck[r], deck[i]
 
 def distribute(list):
     for i in range(7):
-        list[i]=deck.pop()
+        list.append(deck.pop())
 
+game()
 
+while True:
+    print("Continue playing? ([y]/[n])")
+    response = input()
+    while response != 'y' and response != 'n':
+        print("Invalid input: Enter again([y]/[n]): ")
+        response = input()
+    if response == 'y':
+        game()
+    elif response == 'n':
+        break
 
 
 
