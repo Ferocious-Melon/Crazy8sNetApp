@@ -1,46 +1,30 @@
 import socket #Import socket library
-import Crazy8
-import card
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print("Server socket has been created!")
+                
+port = 5251 #Create a port
 
-client = False
-server = False
+c, addr = None
 
-response = input("Will this be the server(host) or the client (s/c): ")
-while response != "s" and response != "c":
-        response = input("Invalid response, enter again (s/c): ")
-
-if response == "s":
-        server = True
-else:
-        client = True
-
-
-while server == True:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("Server socket has been created!")
-        port = 5251 #Create a port
-
+#Run the server
+def runServer():        
         s.bind(('', port)) #Bind socket, allows it to receive from all >        print("Socket has been binded to %s" %(port))
 
         s.listen(1) #Server is only listening to 1 address
         print("The socket of server is listening...")
         
-        while True: #Run while true
-                c, addr = s.accept() #Accept connection
-                print("Connection formed", addr)
-                Crazy8.mainGame()
-                c.close() #Close
-                break
+        c, addr = s.accept() #Accept connection
+        print("Connection formed", addr)
 
-while client == True:
-        s = socket.socket()
+#Send message
+def sendMessage(msg):
+    c.send(('MSG' + msg).encode())
 
-        port = 5251
+#Get input from the client
+def getInput(prompt):
+    c.send(("INP" + str(prompt)).encode())
+    return c.recv(1024).decode()
 
-        try:
-                s.connect(('10.0.1.5', port))
-                print(s.recv(1024).decode())
-                s.close()
-        except ConnectionRefusedError:
-                print("Cannot CREATE CONNECTION!!!!!!!")
-
+def closeServer():
+    c.send('EXT'.encode())
+    s.close()
