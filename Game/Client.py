@@ -1,50 +1,32 @@
 import socket
-import Crazy8
-import card
+s = socket.socket()
+print("Client socket has been created!")
 
-client = False
-server = False
-
-
-response = input("Will this be the server(host) or the client (s/c): ")
-while response != "s" and response != "c":
-        response = input("Invalid response, enter again (s/c): ")
-
-if response == "s":
-        server = True
-else:
-        client = True
+port = 5251
+host = '10.0.1.6'
 
 
-while client == True:
-        s = socket.socket()
+def toMessage(data):
+    message = ''
+    for token in data:
+        message += token + ' '
+    return message
 
-        port = 5251
-
+def runClient():
         try:
-                s.connect(('10.0.1.6', port))
-                print(s.recv(1024).decode()) #Decode the message
-                s.close() #Close
+                s.connect((host, port))
+                print("Succesfully connected to host")
         except ConnectionRefusedError:
                 print("Cannot CREATE connection!!!")
-
-while server == True:
-        port = 5251
-
-        s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("Client socket has been created")
-
-        s.bind(('', port))
-        print("Socket has been binded to %s" %(port))
-
-        s.listen(1)
-        print("The socket of client is listening...")
-
+        
         while True:
-                c, addr = s.accept()
-                print("Connection formed", addr)
-                Crazy8.mainGame()
-                c.send(message.encode())
+            data = s.recv(1024).decode().split(' ')
+            code = data[0]
 
-                c.close()
+            if code == 'MSG':
+                print(toMessage(data[1:]))
+            elif code == 'INP':
+                s.send(input(toMessage(data[1:])))
+            elif code == 'EXT':
+                s.close()
                 break
