@@ -1,11 +1,9 @@
 #Import libraries
+import socket
+import server
+import client
 import card
 import random
-
-#Player1
-#Player2
-player1 = 7
-player2 = 7
 
 #Boolean to determine which player's turn it is
 turn = False
@@ -22,11 +20,27 @@ for suit in suits: #Assign each symbol with numbers 1 - 13
     for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
         deck.append(card.card(suit,i)) #Create card, add to deck
 
+runType = input("Client or Server? (c/v): ")
+if runType == 's':
+    server.runServer()
+    print(server.getInput("Hi how are you?"))
+    server.closeServer()
+elif runType == 'c':
+    client.runClient()
+
+
+def grabInput(prompt):
+    if turn:
+        return input(prompt)
+    else:
+        return server.getInput(prompt)
 
 
 def game(): #Main game
     
     runGame = True
+
+    server.runServer()
 
     goesFirst = random.randint(1, 10) #Decides who goes first
     if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
@@ -131,27 +145,13 @@ def distribute(list): #Distributes the deck to hand
     for i in range(7): #Distributes a total of 7 cards
         list.append(deck.pop()) #Adds card from deck to the list
 
-game() #Call game
-
-while True: #Asks if user wants to continue playing
-    print("Continue playing? ([y]/[n])") #Prompt for input
-    response = input() 
-    while response != 'y' and response != 'n': #If response invalid, ask again
-        print("Invalid input: Enter again([y]/[n]): ")
-        response = input()
-    if response == 'y': #Calls game function if they want to play again
-        game()
-    elif response == 'n': #Program ends
-        break
-
-
-
-
-    
-
-    
-        
-    
-        
-    
-        
+# while True: #Asks if user wants to continue playing
+#     print("Continue playing? ([y]/[n])") #Prompt for input
+#     response = input() 
+#     while response != 'y' and response != 'n': #If response invalid, ask again
+#         print("Invalid input: Enter again([y]/[n]): ")
+#         response = input()
+#     if response == 'y': #Calls game function if they want to play again
+#         game()
+#     elif response == 'n': #Program ends
+#         break
