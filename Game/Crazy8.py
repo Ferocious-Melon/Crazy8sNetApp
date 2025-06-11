@@ -68,19 +68,14 @@ def game(): #Main game
         print("\x1b[2J") #Clear console
         print("\x1b[2J")
 
-        #Displays what card is in play, # of cards your opponent has, and who's turn it is
-        print("Card currently in play: ", cardInPlay)
-        print("Number of cards your opponent has: ", len(hand2))
-
         #Stores hand1 or 2 in current hand depending on who's turn it is
         currentHand = hand1 if turn else hand2
         currPlayer = '1' if turn else '2'
         print("Player ",currPlayer,"'s turn",sep="")
 
-        #Prints out the hand using a for-loop, going through each index
-        for i in range(len(currentHand)):
-                print("[", i, "] ", currentHand[i], sep="")
-                print("\n")
+        statusToString(currentHand, cardInPlay)
+
+        print(handToString(currentHand))
         
         #When player decides to play a card
         canPlay = False 
@@ -144,6 +139,17 @@ def shuffle(): #Shuffles the deck
 def distribute(list): #Distributes the deck to hand
     for i in range(7): #Distributes a total of 7 cards
         list.append(deck.pop()) #Adds card from deck to the list
+
+def handToString(currentHand):
+    msg = ''
+    for i in range(len(currentHand)):
+        msg += "[ "+ str(i) + " ] " + currentHand[i].__str__() + '\n'
+    return msg
+
+def statusToString(curr, inPlay):
+    #Displays what card is in play, # of cards your opponent has, and who's turn it is
+    print("Card currently in play: ", inPlay)
+    print("Number of cards your opponent has: ", len(curr))
 
 # while True: #Asks if user wants to continue playing
 #     print("Continue playing? ([y]/[n])") #Prompt for input
