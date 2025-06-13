@@ -128,10 +128,11 @@ def game(): #Main game
                         sendMessage('['+str(i)+'] '+ currentHand[i].__str__() + '\n')
                     
                 #Ask player to pick a card to play or void the rest of their turn
-                try:
-                    choice = int(grabInput("Choose an index to play or another input to continue: ")) 
-                except ValueError:
-                    choice = -1
+                if len(possibleCards) != 0:
+                    try:
+                        choice = int(grabInput("Choose an index to play or another input to continue: ")) 
+                    except ValueError:
+                        choice = -1
                 
                 if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
                     cardInPlay = currentHand.pop(choice)    #Play the card
