@@ -37,7 +37,7 @@ def statusToString():
     #Displays what card is in play, # of cards your opponent has, and who's turn it is
     msg += "Player " + currPlayer + "'s turn. \n"
     msg += "Card currently in play: " + cardInPlay.__str__() + '\n'
-    msg += "Number of cards your opponent has: " + str(len(if currentHand== hand1 hand2 else hand1))
+    msg += "Number of cards your opponent has: " + str(len(hand2 if currentHand==hand1 else hand1))
     return msg
 
 def handToString():
