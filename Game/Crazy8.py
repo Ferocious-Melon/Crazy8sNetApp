@@ -20,18 +20,23 @@ currPlayer = None
 
 #Input function which takes from different sources based on turn
 def grabInput(prompt):
+    #If it is the server's turn
     if turn:
-        return input(prompt)
+        return input(prompt) #Grab regular input
+    #Otherwise
     else:
-        return server.getInput(prompt)
+        return server.getInput(prompt) #Prompt server to grab input from client
 
 #Output function which takes from different sources based on turn
 def sendMessage(msg):
+    #If it is the server's turn
     if turn:
-        print(msg,end='')
+        print(msg,end='') #Print regularly
+    #Otherwise
     else:
-        server.sendMessage(msg)
+        server.sendMessage(msg) #Tell the client to send a message
 
+#Converts the current status of play to a string
 def statusToString():
     msg = ''
     #Displays what card is in play, # of cards your opponent has, and who's turn it is
@@ -40,12 +45,14 @@ def statusToString():
     msg += "Number of cards your opponent has: " + str(len(hand2 if currentHand==hand1 else hand1))
     return msg
 
+#Converts the hand of the current player to string
 def handToString():
     msg = ''
     for i in range(len(currentHand)):
         msg += "[ "+ str(i) + " ] " + currentHand[i].__str__() + '\n'
     return msg
 
+#Displays a win on both players screens
 def displayWin():
     global turn
     
@@ -53,18 +60,17 @@ def displayWin():
     turn = not turn
     sendMessage("Congratulations! Player " + currPlayer + " has won the game!")
 
-def game(): #Main game
+ #Function to run the game
+def game():
     global deck, currentHand, currPlayer, cardInPlay, turn
-
-    runGame = True
-
+    
     #Clear player hands and dec
     deck.clear()
     hand1.clear()
     hand2.clear()
 
     suits = ('D','C','H','S') #Suits of the cards [Diamond, Club, Heart, Spade]
-    
+
     #Add all of the corresponding cards from each suit
     for suit in suits: 
         for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
@@ -89,6 +95,7 @@ def game(): #Main game
     #Sets the first card in play
     cardInPlay = deck.pop()
 
+    runGame = True
     #Main loop, runs the game
     while runGame == True:
         #Stores hand1 or 2 in current hand depending on who's turn it is
