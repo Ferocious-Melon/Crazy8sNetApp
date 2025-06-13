@@ -37,7 +37,7 @@ def statusToString():
     #Displays what card is in play, # of cards your opponent has, and who's turn it is
     msg += "Player " + currPlayer + "'s turn. \n"
     msg += "Card currently in play: " + cardInPlay.__str__() + '\n'
-    msg += "Number of cards your opponent has: " + str(len(currentHand))
+    msg += "Number of cards your opponent has: " + str(len(if currentHand== hand1 hand2 else hand1))
     return msg
 
 def handToString():
@@ -57,9 +57,6 @@ def game(): #Main game
     global deck, currentHand, currPlayer, cardInPlay, turn
 
     runGame = True
-
-    server.runServer()
-
 
     #Clear player hands and dec
     deck.clear()
@@ -190,6 +187,8 @@ runType = input("Client or Server? (c/s): ")
 
 if runType == 's':
     
+    server.runServer()
+
     game() #Starts the game
     
     while True: #Asks if user wants to continue playing
