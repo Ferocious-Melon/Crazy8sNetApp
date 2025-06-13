@@ -186,6 +186,8 @@ def distribute(list): #Distributes the deck to hand
 runType = input("Client or Server? (c/s): ")
 
 if runType == 's':
+
+    server.runServer()
     
     server.runServer()
 
