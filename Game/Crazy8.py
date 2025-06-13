@@ -118,19 +118,21 @@ def game(): #Main game
             
             #Check for other cards available to play
             possibleCards = [] #Create list
-            for i in range(len(currentHand)): #Go through the currentHand list
-                if cardInPlay.num == currentHand[i].num: #Check if the num value of cardInPlay & currentHand are the same
-                    possibleCards.append(i) #Add card to possibleCards list
-                    sendMessage('[' + str(i) + '] ' + currentHand[i].__str__() + '\n')
+            for card in currentHand: #Go through the currentHand list
+                if cardInPlay.num == card.num: #Check if the num value of cardInPlay & currentHand are the same
+                    possibleCards.append(card) #Add card to possibleCards list
 
             #While there are still cards to play...
             while(len(possibleCards) != 0):
+                for i in range(len(possibleCards)):
+                    sendMessage('['+str(i)+'] '+ possibleCards[i].__str__() + '\n')
+                    
                 #Ask player to pick a card to play or void the rest of their turn
                 choice = int(grabInput("Choose an index to play or another input to continue: ")) 
                 
                 if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
-                    cardInPlay = currentHand.pop(choice)    #Play the card
-                    possibleCards.remove(choice)            #Remove it from possible optoins
+                    cardInPlay = possibleCards.pop(choice)    #Play the card
+                    currentHand.remove(cardInPlay)            #Remove it from possible optoins
 
                     sendMessage("Card In Play " + cardInPlay.__str__() + '\n') #Print so
                 
