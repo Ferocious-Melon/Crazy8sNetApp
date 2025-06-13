@@ -13,39 +13,70 @@ deck = []
 hand1 = []
 hand2 = []
 
+#Variables used for processing the current turn
+cardInPlay = None
+currentHand = None
+currPlayer = None
 
-suits = ('D','C','H','S') #Suits of the cards [Diamond, Club, Heart, Spade]
-
-for suit in suits: #Assign each symbol with numbers 1 - 13
-    for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
-        deck.append(card.card(suit,i)) #Create card, add to deck
-
-runType = input("Client or Server? (c/v): ")
-if runType == 's':
-    server.runServer()
-    print(server.getInput("Hi how are you?"))
-    server.closeServer()
-elif runType == 'c':
-    client.runClient()
-
-
+#Input function which takes from different sources based on turn
 def grabInput(prompt):
     if turn:
         return input(prompt)
     else:
         return server.getInput(prompt)
 
+#Output function which takes from different sources based on turn
+def sendMessage(msg):
+    if turn:
+        print(msg,end='')
+    else:
+        server.sendMessage(msg)
+
+def statusToString():
+    msg = ''
+    #Displays what card is in play, # of cards your opponent has, and who's turn it is
+    msg += "Player " + currPlayer + "'s turn. \n"
+    msg += "Card currently in play: " + cardInPlay.__str__() + '\n'
+    msg += "Number of cards your opponent has: " + str(len(currentHand))
+    return msg
+
+def handToString():
+    msg = ''
+    for i in range(len(currentHand)):
+        msg += "[ "+ str(i) + " ] " + currentHand[i].__str__() + '\n'
+    return msg
+
+def displayWin():
+    global turn
+    
+    sendMessage("Congratulations! Player " + currPlayer + " has won the game!")
+    turn = not turn
+    sendMessage("Congratulations! Player " + currPlayer + " has won the game!")
 
 def game(): #Main game
-    
+    global deck, currentHand, currPlayer, cardInPlay, turn
+
     runGame = True
 
     server.runServer()
 
+
+    #Clear player hands and dec
+    deck.clear()
+    hand1.clear()
+    hand2.clear()
+
+    suits = ('D','C','H','S') #Suits of the cards [Diamond, Club, Heart, Spade]
+    
+    #Add all of the corresponding cards from each suit
+    for suit in suits: 
+        for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
+            deck.append(card.card(suit,i)) #Create card, add to deck
+
+
     goesFirst = random.randint(1, 10) #Decides who goes first
     if random.randint(1, 10) >= 5: #Number greater than 5, player 2 goes first
         turn = False
-
     else: #Any number (Less than 5) means it's player 1's turn
         turn = True #True - Player 1, False - Player 2
 
@@ -58,39 +89,34 @@ def game(): #Main game
     distribute(hand1)
     distribute(hand2)
 
-    #Stores either hand1 or 2, depending on who's turn it is
-    currentHand=None
+    #Sets the first card in play
     cardInPlay = deck.pop()
 
     #Main loop, runs the game
     while runGame == True:
-
-        print("\x1b[2J") #Clear console
-        print("\x1b[2J")
-
         #Stores hand1 or 2 in current hand depending on who's turn it is
+        #Does the same for player number
         currentHand = hand1 if turn else hand2
         currPlayer = '1' if turn else '2'
-        print("Player ",currPlayer,"'s turn",sep="")
 
-        statusToString(currentHand, cardInPlay)
-
-        print(handToString(currentHand))
+        #Clears screen, displays game status, and current player's hand
+        sendMessage("\x1b[2J" + statusToString() + '\n' + handToString())
         
-        #When player decides to play a card
+        #Checks if a player has a playable card
         canPlay = False 
         for c in currentHand: #For loop to go through current hand
             if(c.compare(cardInPlay) == True): #Check if currentHand[c] matches cardInPlay
-                canPlay = True #Set to true
-        if canPlay: #If true, player can play a card
-            print("Choose a card (by index): ") #Prompt user
-            choice = int(input())
-            #If input is unplayable, ask the user again
+                canPlay = True                 #Set to true
+        
+        if canPlay:
+            #Ask the player to choose a card 
+            choice = int(grabInput("Choose a card (by index): "))
+            #While choice is invalid
             while not (choice in range(0,len(currentHand)) and cardInPlay.compare(currentHand[choice])):
-                print("Cannot play that card")
-                choice = int(input("Choose another (by index): "))
+                sendMessage("Cannot play that card\n")
+                choice = int(grabInput("Choose another (by index): "))
 
-            #Set cardInPlay as the chosen card, the pop returns the card, setting cardInPlay as that card while also removing it from currentHand
+            #Set cardInPlay as the chosen card
             cardInPlay = currentHand.pop(choice)
             
             #Check for other cards available to play
@@ -98,34 +124,51 @@ def game(): #Main game
             for i in range(len(currentHand)): #Go through the currentHand list
                 if cardInPlay.num == currentHand[i].num: #Check if the num value of cardInPlay & currentHand are the same
                     possibleCards.append(i) #Add card to possibleCards list
-                    print("[", i, "] ", currentHand[i], sep="") #Print out possible choices
-                    print("\n")
+                    sendMessage('[' + str(i) + '] ' + currentHand[i].__str__() + '\n')
 
-            while(len(possibleCards) != 0): #While the length of possible cards isn't 0
-                choice = int(input("Choose an index to play or another input to continue")) #Prompt user
-                if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If choice is valid, set cardInPlay as chosen card, while deleting the card from currentHand
-                    cardInPlay = currentHand.pop(choice)
-                    possibleCards.remove(choice)
-                    print("Card In Play", cardInPlay)
+            #While there are still cards to play...
+            while(len(possibleCards) != 0):
+                #Ask player to pick a card to play or void the rest of their turn
+                choice = int(grabInput("Choose an index to play or another input to continue")) 
+                
+                if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
+                    cardInPlay = currentHand.pop(choice)    #Play the card
+                    possibleCards.remove(choice)            #Remove it from possible optoins
+
+                    sendMessage("Card In Play " + cardInPlay.__str__() + '\n') #Print so
+                
                 else: #User decides to skip turn
-                    possibleCards.clear()
+                    possibleCards.clear() #Clear possible cards to forcibly end loop
 
-            if len(currentHand) == 0: #If currentHand is 0, the currPlayer has won the game
-                print("Congratulations! Player", currPlayer, " has won the game!")
+            #Checks if the player has won and ends the game
+            if len(currentHand) == 0: 
+                displayWin()
                 runGame = False
+        
+        
         else: #If player has no valid cards, they will draw a card
-            newCard = deck.pop() #Card drawn
-            print("Card Drawn: ",newCard) #Prints out what card they drew
+            
+            #Draw card and display what it is
+            newCard = deck.pop()
+            sendMessage("Card Drawn: " + newCard.__str__() + '\n')
+            
             currentHand.append(newCard) #Add the drawn card to the hand
 
-            if newCard.compare(cardInPlay):#If the drawn card is valid, will ask user if they want to use
-                toPlay = input("Do you want to play it? [y/n]: ") #Prompt
-                while toPlay != "y" and toplay != "n": #If response invalid, will ask to enter again
-                    toPlay = input("Enter proper response: [y/n]: ")
-                if toPlay == "y": #Plays the drawn card
-                    cardInPlay = currentHand.pop()
+            #Ask if user wants to play the card drawn (regardless of viability)
+            toPlay = grabInput("Do you want to play it? [y/n]: ") 
+            while toPlay != "y" and toPlay != "n":
+                toPlay = grabInput("Enter proper response: [y/n]: ")
 
-        input("Hit 'Enter' to continue.") #Confirm move
+            #If they wish to play card...
+            if toPlay == 'y':
+                #Check if it is viable to play...
+                if cardInPlay.compare(newCard):
+                    cardInPlay = newCard    #Update card in play
+                    currentHand.pop()       #Remove card from hand
+                    sendMessage('Card in play: ' + cardInPlay.__str__() + '\n') #Print success
+                else:
+                    sendMessage('Card is not playable' + '\n') #Print failure
+        
         turn = not turn #Switches to other player's turn
 
 
@@ -140,24 +183,29 @@ def distribute(list): #Distributes the deck to hand
     for i in range(7): #Distributes a total of 7 cards
         list.append(deck.pop()) #Adds card from deck to the list
 
-def handToString(currentHand):
-    msg = ''
-    for i in range(len(currentHand)):
-        msg += "[ "+ str(i) + " ] " + currentHand[i].__str__() + '\n'
-    return msg
+#----------------------------------------Main program begins here----------------------------------------
 
-def statusToString(curr, inPlay):
-    #Displays what card is in play, # of cards your opponent has, and who's turn it is
-    print("Card currently in play: ", inPlay)
-    print("Number of cards your opponent has: ", len(curr))
+#Prompts user for how they want their program to 
+runType = input("Client or Server? (c/s): ") run
 
-# while True: #Asks if user wants to continue playing
-#     print("Continue playing? ([y]/[n])") #Prompt for input
-#     response = input() 
-#     while response != 'y' and response != 'n': #If response invalid, ask again
-#         print("Invalid input: Enter again([y]/[n]): ")
-#         response = input()
-#     if response == 'y': #Calls game function if they want to play again
-#         game()
-#     elif response == 'n': #Program ends
-#         break
+if runType == 's':
+    
+    game() #Starts the game
+    
+    while True: #Asks if user wants to continue playing
+
+        print("Continue playing? ([y]/[n])") #Prompt for input
+        response = input() 
+        while response != 'y' and response != 'n': #If response invalid, ask again
+            print("Invalid input: Enter again([y]/[n]): ")
+            response = input()
+
+        if response == 'y': #Calls game function if they want to play again
+            game()
+        elif response == 'n': #Program ends
+            server.closeServer()
+            break
+
+elif runType == 'c':
+    #Enters client mode
+    client.runClient()
