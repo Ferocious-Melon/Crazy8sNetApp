@@ -58,9 +58,6 @@ def game(): #Main game
 
     runGame = True
 
-    server.runServer()
-
-
     #Clear player hands and dec
     deck.clear()
     hand1.clear()
@@ -129,7 +126,7 @@ def game(): #Main game
             #While there are still cards to play...
             while(len(possibleCards) != 0):
                 #Ask player to pick a card to play or void the rest of their turn
-                choice = int(grabInput("Choose an index to play or another input to continue")) 
+                choice = int(grabInput("Choose an index to play or another input to continue: ")) 
                 
                 if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
                     cardInPlay = currentHand.pop(choice)    #Play the card
@@ -189,6 +186,8 @@ def distribute(list): #Distributes the deck to hand
 runType = input("Client or Server? (c/s): ")
 
 if runType == 's':
+
+    server.runServer()
     
     game() #Starts the game
     
