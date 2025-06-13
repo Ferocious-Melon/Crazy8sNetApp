@@ -186,7 +186,7 @@ def distribute(list): #Distributes the deck to hand
 #----------------------------------------Main program begins here----------------------------------------
 
 #Prompts user for how they want their program to 
-runType = input("Client or Server? (c/s): ") run
+runType = input("Client or Server? (c/s): ")
 
 if runType == 's':
     
