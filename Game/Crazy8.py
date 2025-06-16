@@ -52,6 +52,15 @@ def handToString():
         msg += "[ "+ str(i) + " ] " + currentHand[i].__str__() + '\n'
     return msg
 
+def playCard(nextCard):
+    if(nextCard.num == 8):
+        newSuit = 'bleh'
+        while newSuit not in card.suits:
+            newSuit = grabInput('Enter new valid suit (D,S,H,C): ')
+        cardInPlay = card.card(newSuit,8)
+    else:
+        cardInPlay = nextCard
+
 #Displays a win on both players screens
 def displayWin():
     global turn
@@ -69,10 +78,8 @@ def game():
     hand1.clear()
     hand2.clear()
 
-    suits = ('D','C','H','S') #Suits of the cards [Diamond, Club, Heart, Spade]
-
     #Add all of the corresponding cards from each suit
-    for suit in suits: 
+    for suit in card.suits: 
         for i in range(1,13+1): #Assign each number according to the symbol, suit, from 1 - 13
             deck.append(card.card(suit,i)) #Create card, add to deck
 
@@ -121,10 +128,11 @@ def game():
                 choice = int(grabInput("Choose another (by index): "))
 
             #Set cardInPlay as the chosen card
-            cardInPlay = currentHand.pop(choice)
+            playCard(currentHand.pop(choice))
             
             #Check for other cards available to play
             possibleCards = ['temp'] #Create list with temporary value
+            
             #While there are still cards to play...
             while(len(possibleCards) != 0):
                 
@@ -135,20 +143,20 @@ def game():
                         sendMessage('['+str(i)+'] '+ currentHand[i].__str__() + '\n')
                     
                 #Ask player to pick a card to play or void the rest of their turn
-                if len(possibleCards) != 0:
+                if len(possibleCards) != 0:a
                     try:
                         choice = int(grabInput("Choose an index to play or another input to continue: ")) 
                     except ValueError:
                         choice = -1
                 
-                if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
-                    cardInPlay = currentHand.pop(choice)    #Play the card
-                    possibleCards.remove(choice)            #Remove it from possible optoins
+                    if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
+                        playCard(currentHand.pop(choice))    #Play the card
+                        possibleCards.remove(choice)            #Remove it from possible optoins
 
-                    sendMessage("Card In Play " + cardInPlay.__str__() + '\n') #Print so
+                        sendMessage("Card In Play " + cardInPlay.__str__() + '\n') #Print so
                 
-                else: #User decides to skip turn
-                    possibleCards.clear() #Clear possible cards to forcibly end loop
+                    else: #User decides to skip turn
+                        possibleCards.clear() #Clear possible cards to forcibly end loop
 
             #Checks if the player has won and ends the game
             if len(currentHand) == 0: 
@@ -173,7 +181,7 @@ def game():
             if toPlay == 'y':
                 #Check if it is viable to play...
                 if cardInPlay.compare(newCard):
-                    cardInPlay = newCard    #Update card in play
+                    playCard(newCard)    #Update card in play
                     currentHand.pop()       #Remove card from hand
                     sendMessage('Card in play: ' + cardInPlay.__str__() + '\n') #Print success
                 else:
