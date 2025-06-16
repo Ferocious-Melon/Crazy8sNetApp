@@ -123,7 +123,7 @@ def game():
             #Ask the player to choose a card 
             choice = int(grabInput("Choose a card (by index): "))
             #While choice is invalid
-            while not (choice in range(0,len(currentHand)) and cardInPlay.compare(currentHand[choice])):
+            while not (choice in range(0,len(currentHand)) and currentHand[choice].compare(cardInPlay)):
                 sendMessage("Cannot play that card\n")
                 choice = int(grabInput("Choose another (by index): "))
 
@@ -143,14 +143,14 @@ def game():
                         sendMessage('['+str(i)+'] '+ currentHand[i].__str__() + '\n')
                     
                 #Ask player to pick a card to play or void the rest of their turn
-                if len(possibleCards) != 0:a
+                if len(possibleCards) != 0:
                     try:
                         choice = int(grabInput("Choose an index to play or another input to continue: ")) 
                     except ValueError:
                         choice = -1
                 
-                    if choice in possibleCards and cardInPlay.compare(currentHand[choice]): #If valid choice
-                        playCard(currentHand.pop(choice))    #Play the card
+                    if choice in possibleCards and currentHand[choice].compare(cardInPlay): #If valid choice
+                        playCard(currentHand.pop(choice))    	#Play the card
                         possibleCards.remove(choice)            #Remove it from possible optoins
 
                         sendMessage("Card In Play " + cardInPlay.__str__() + '\n') #Print so
@@ -180,7 +180,7 @@ def game():
             #If they wish to play card...
             if toPlay == 'y':
                 #Check if it is viable to play...
-                if cardInPlay.compare(newCard):
+                if newCard.compare(cardInPlay):
                     playCard(newCard)    #Update card in play
                     currentHand.pop()       #Remove card from hand
                     sendMessage('Card in play: ' + cardInPlay.__str__() + '\n') #Print success
