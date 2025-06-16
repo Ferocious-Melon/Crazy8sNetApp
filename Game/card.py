@@ -1,6 +1,7 @@
-numToChar = ('-1','A','2','3','4','5','6','7','8','9','10','J','Q','K')
+numtocard = ('-1','A','2','3','4','5','6','7','8','9','10','J','Q','K')
+suits = ('D','C','H','S')
 
-class card: #Create class
+class card:
     def __init__(self,suit,num):
         self.suit = suit
         self.num = num
@@ -9,11 +10,11 @@ class card: #Create class
         '''Jack, Queen, King = 11, 12, 13'''
     #String representation of the card
     def __str__(self):
-        return numToChar[self.num]+self.suit
+        return numtocard[self.num]+self.suit 
 
     #Returns whether or not this card is playable
     def compare(self,active):
-        return active.suit==self.suit or active.num==self.num
+        return card.num == 8 or active.suit==self.suit or active.num==self.num
 
 # myCard = card('C',8)
 # otherCard = card ('C',10)
