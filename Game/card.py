@@ -14,7 +14,7 @@ class card:
 
     #Returns whether or not this card is playable
     def compare(self,active):
-        return card.num == 8 or active.suit==self.suit or active.num==self.num
+        return self.num == 8 or active.suit==self.suit or active.num==self.num
 
 # myCard = card('C',8)
 # otherCard = card ('C',10)
