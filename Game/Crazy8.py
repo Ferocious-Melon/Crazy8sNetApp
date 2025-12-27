@@ -53,6 +53,8 @@ def handToString():
     return msg
 
 def playCard(nextCard):
+    global cardInPlay
+
     if(nextCard.num == 8):
         newSuit = 'bleh'
         while newSuit not in card.suits:

@@ -5,7 +5,7 @@ s = socket.socket()
 print("Client socket has been created!")
 
 port = 5251             #Assign random port
-host = '192.168.68.126' #Assign host device IP (found manually)
+host = '' #Assign host device IP (found manually)
 
 codes = ('MSG', 'INP', 'EXT') #List of possible codes that can be received from server
 
@@ -48,7 +48,7 @@ def runClient():
                 msgs.append([])
             #Otherwise...
             elif len(msgs) != 0:                    #(Edge case from blank string before first OP code)
-                msgs[len(msgs)-1].append(token)     #Add to the current message
+                msgs[-1].append(token)              #Add to the current message
 
         #Loop through queue of operations
         for i in range(len(comms)):
