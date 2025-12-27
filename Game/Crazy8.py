@@ -200,32 +200,3 @@ def shuffle(): #Shuffles the deck
 def distribute(list): #Distributes the deck to hand
     for i in range(7): #Distributes a total of 7 cards
         list.append(deck.pop()) #Adds card from deck to the list
-
-#----------------------------------------Main program begins here----------------------------------------
-
-#Prompts user for how they want their program to 
-runType = input("Client or Server? (c/s): ")
-
-if runType == 's':
-    
-    server.runServer()
-
-    game() #Starts the game
-    
-    while True: #Asks if user wants to continue playing
-
-        print("Continue playing? ([y]/[n])") #Prompt for input
-        response = input() 
-        while response != 'y' and response != 'n': #If response invalid, ask again
-            print("Invalid input: Enter again([y]/[n]): ")
-            response = input()
-
-        if response == 'y': #Calls game function if they want to play again
-            game()
-        elif response == 'n': #Program ends
-            server.closeServer()
-            break
-
-elif runType == 'c':
-    #Enters client mode
-    client.runClient()
