@@ -1,11 +1,12 @@
 import socket
 
 #Create socekt object
-s = socket.socket()
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Client socket has been created!")
 
-port = 5251             #Assign random port
-host = '' #Assign host device IP (found manually)
+'''CHANGE THIS TO THE SERVER'S LOCAL IP ADDRESS'''
+host = '192.168.68.136' #Assign host device IP (found manually)
+port = None             #Set global port variable
 
 codes = ('MSG', 'INP', 'EXT') #List of possible codes that can be received from server
 
