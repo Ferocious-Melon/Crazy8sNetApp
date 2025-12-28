@@ -1,8 +1,9 @@
 # Crazy8sNetApp
-A simple net application running a bare bones version of crazy 8s for two players.
 
-<hr>
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+A recreation of the card game Crazy8s to be played from the console. Written in python as an exercise in using the socket library and understanding network communication.
 
-There used to be a log here but it was incomplete.
-Oh well.
+### Features Hope For:
+- GUI
+- Several players
+- Different rulesets
+- Proper executable (?)
