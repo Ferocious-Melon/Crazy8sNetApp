@@ -8,7 +8,7 @@ runType = input("Client or Server? (c/s): ")
 
 if runType == 's':
     
-    server.runServer()
+    server.startServer()
 
     c8.game() #Starts the game
     
