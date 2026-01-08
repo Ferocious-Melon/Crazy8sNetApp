@@ -1,6 +1,6 @@
 import socket
 
-#Create socekt object
+#Create socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Client socket has been created!")
 
@@ -21,17 +21,17 @@ def toMessage(l):
 #runClient (void)
 #Executes the client's basic functions
 def runClient():
-    
+
     comms = [] #List of commands on most recent signal received
     msgs = []  #List of msgs that come along with them
     data = []  #Raw data taken from server
-    
+
     port = int(input('Enter port: ')) #Grab a user inputted port
 
     #Try to connect to host
     s.connect((host, port))
     print("Succesfully connected to host")
-    
+
     #Enter main loop
     while True:
         #Grab data from server and split it into space separated tokens
@@ -39,7 +39,7 @@ def runClient():
 
         #Loop through data
         for i in range(len(data)):
-            
+
             token = data[i]
 
             #If the token is an opp code
