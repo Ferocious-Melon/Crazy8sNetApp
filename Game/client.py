@@ -11,7 +11,9 @@ print("Client socket has been created!")
 host = '192.168.68.136' #Assign host device IP (found manually)
 port = config["port"]             #Set global port variable
 
-codes = ('MSG', 'INP', 'EXT') #List of possible codes that can be received from server
+playerID = -1
+
+codes = ('IDSET', 'IDGET', 'MSG', 'INP', 'EXT') #List of possible codes that can be received from server
 
 #toMessage (String)
 #Returns the string format of split data taken across the network
@@ -26,8 +28,8 @@ def toMessage(l):
 def runClient():
 
     comms = [] #List of commands on most recent signal received
-    msgs = []  #List of msgs that come along with them
-    data = []  #Raw data taken from server
+    argss = [] #List of arguments that come along with them
+    data  = []  #Raw data taken from server
 
     port = int(input('Enter port: ')) #Grab a user inputted port
 
@@ -49,24 +51,28 @@ def runClient():
             if token in codes:
                 #Create a new command to be processed
                 comms.append(token)
-                msgs.append([])
+                argss.append([])
             #Otherwise...
-            elif len(msgs) != 0:                    #(Edge case from blank string before first OP code)
-                msgs[-1].append(token)              #Add to the current message
+            elif len(argss) != 0:                    #(Edge case from blank string before first OP code)
+                argss[-1].append(token)              #Add to the current message
 
         #Loop through queue of operations
         for i in range(len(comms)):
             #Grab the code and message
             code = comms[i]
-            msg = msgs[i]
+            args = argss[i]
 
             #Based on op code...
-            if code == 'MSG':
+            if code == 'IDSET':
+                playerID = int(args)
+            elif code == 'IDGET':
+                s.send(str(id).encode())
+            elif code == 'MSG':
                 #Print out message received
-                print(toMessage(msg))
+                print(toMessage(args))
             elif code == 'INP':
                 #Prompt for input and send back to server
-                inp = input(toMessage(msg))
+                inp = input(toMessage(args))
                 s.send(inp.encode())
             elif code == 'EXT':
                 #Close down the client
@@ -76,4 +82,4 @@ def runClient():
         #Clear all information for next loop
         data.clear()
         comms.clear()
-        msgs.clear()
+        argss.clear()

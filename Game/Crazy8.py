@@ -3,6 +3,7 @@ import socket
 import server
 import client
 import card
+import player
 import random
 
 #Boolean to determine which player's turn it is
@@ -13,10 +14,19 @@ deck = []
 hand1 = []
 hand2 = []
 
+players = []
+
 #Variables used for processing the current turn
 cardInPlay = None
 currentHand = None
 currPlayer = None
+
+#Setup the player list from established connections
+def setupGame(conns,addrs):
+    players.append(player.player(0,"host"))
+    for  i in range(len(conns)):
+        p = player.player(conns[i],addrs[i],i,"temp")
+        players.append(p)
 
 #Input function which takes from different sources based on turn
 def grabInput(prompt):

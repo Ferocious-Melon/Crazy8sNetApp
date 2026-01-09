@@ -21,6 +21,8 @@ jobQ = Queue()
 connections = []
 addresses = []
 
+accepting = True
+
 port = config["port"]
 hostIP = None
 client = None
@@ -67,7 +69,6 @@ def accepting_connection():
 
             #Print IP of machine connected to
             print("Connection established with : " + addr[0])
-
 
         except Exception as error:
             print("Socket connections error",error)
@@ -148,6 +149,10 @@ def startServer():
     create_threads()
 
     print("Server online. Host IP : ", hostIP)
+
+#Set a client's associated player id
+def setClientID(conn,id):
+    conn.send((' IDSET '+ str(id)).encode())
 
 #Sends a message to the client
 def sendMessage(conn,msg):
