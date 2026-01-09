@@ -4,14 +4,14 @@ import client
 import Crazy8 as c8
 
 #Prompts user for how they want their program to 
-runType = input("Client or Server? (c/s): ")
+runType = input("Host or Join? (h/j): ")
 
-if runType == 's':
-    
+if runType == 'h':
+
     server.startServer()
 
     c8.game() #Starts the game
-    
+
     while True: #Asks if user wants to continue playing
 
         print("Continue playing? ([y]/[n])") #Prompt for input
@@ -26,6 +26,6 @@ if runType == 's':
             server.closeServer()
             break
 
-elif runType == 'c':
+elif runType == 'j':
     #Enters client mode
     client.runClient()

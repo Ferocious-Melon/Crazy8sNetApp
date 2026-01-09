@@ -1,8 +1,9 @@
+import json
 import socket #Import socket library
-import sys
 import threading
-import time
 from queue import Queue
+
+config=json.loads(open("config.json").read())
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Server socket has been created!")
@@ -14,25 +15,22 @@ MSG_MED = 1024
 NUM_THREADS = 2
 JOB_NUMBER = [1, 2]
 
+OTHER_PLAYERS = config["players"]-1
+
 jobQ = Queue()
 connections = []
 addresses = []
 
-'''CHANGE THIS TO YOUR LOCAL IP ADDRESS'''
-hostIP = '192.168.68.136' #Use private IP address of host machine
-port = None               #Set port as a global variable
-
-#Set default values for connection and address
+port = config["port"]
+hostIP = None
 client = None
 addr = None
 
 def create_socket():
     global hostIP, port, s
 
+    '''CHANGE THIS TO YOUR LOCAL IP ADDRESS. WILL BREAK IF NOT SET UP PROPERLY'''
     hostIP = '172.17.155.196' #Machine's local IP
-
-    #Prompt user for their desired port
-    port = int(input('Enter port: '))
 
     s = socket.socket()
 
@@ -43,7 +41,7 @@ def bind_socket():
 
     try:
         s.bind((hostIP, port)) #Bind socket to host IP and port
-        s.listen(5)
+        s.listen(OTHER_PLAYERS)
         print("Socket has been binded to %s" %(port))
 
     except socket.error as msg:
@@ -67,6 +65,7 @@ def accepting_connection():
             connections.append(conn)
             addresses.append(addr)
 
+            #Print IP of machine connected to
             print("Connection established with : " + addr[0])
 
 
@@ -74,34 +73,10 @@ def accepting_connection():
             print("Socket connections error",error)
 
 #2nd Thread - Communicating with clients
-# See clients
-# Select client
-# Send a command to client
-# (Will be done via a shell for now)
-
-#Main function to run the shell
-def start_shell():
-
-    while True:
-        #Output command UI
-        cmd = input("C8> ").split(' ')
-
-        act = cmd[0]
-        args = cmd[1:]
-
-        match act:
-            case 'list':
-                list_connections()
-
-            case 'select':
-                conn = get_target(args)
-                if conn is not None:
-                    send_comms(conn)
-
-            case _: #No recognized commands
-                print(act, "command not recognized")
+#Run the game code
 
 #Display all current active connections
+'''CURRENTLY UNACCESIBLE DURING EXECUTION'''
 def list_connections():
     global connections
     global addresses
@@ -140,23 +115,6 @@ def get_target(args):
     except:
         print("Invalid Selection") #Due to invalid index or input
 
-
-#While true loop to send commands to the client
-def send_comms(conn):
-    while True:
-        try:
-            cmd = input()
-            if cmd == 'quit':
-                break
-            if len(str.encode(cmd)) > 0:
-                conn.send(str.encode(cmd))
-                client_response = str(conn.recv(20480),"utf-8")
-                print(client_response,end="")
-        except:
-            print("Error sending commands")
-            break
-
-
 #Threading logic begins below
 
 def create_threads():
@@ -182,29 +140,71 @@ def create_jobs():
 
     jobQ.join()
 
-create_threads()
-create_jobs()
-
 #Run the server
 def startServer():
     global port, client, addr
 
-    # create_socket()
-    # bind_socket()
+    create_jobs()
+    create_threads()
 
-    # client, addr = s.accept()
-    # print("Connections established :", addr)
+    print("Server online. Host IP : ", hostIP)
 
 #Sends a message to the client
-def sendMessage(msg):
-    client.send((' MSG ' + msg).encode())
+def sendMessage(conn,msg):
+    conn.send((' MSG ' + msg).encode())
 
 #Get input from the client
-def getInput(prompt=""):
-    client.send((' INP ' + str(prompt)).encode())
-    return client.recv(1024).decode()
+def getInput(conn,prompt=""):
+    conn.send((' INP ' + str(prompt)).encode())
+    return client.recv(MSG_MED).decode()
 
 #Close both the server and client connection
 def closeServer():
-    client.send(' EXT '.encode())
+    for c in connections:
+        c.close()
     s.close()
+
+
+'''CODE CURRENTLY INACCESSIBLE:
+
+- From testing multi client connections.
+
+'''
+#Main function to run the shell
+def start_shell():
+
+    while True:
+        #Output command UI
+        cmd = input("C8> ").split(' ')
+
+        act = cmd[0]
+        args = cmd[1:]
+
+        match act:
+            case 'list':
+                list_connections()
+
+            case 'select':
+                conn = get_target(args)
+                if conn is not None:
+                    send_comms(conn)
+
+            case _: #No recognized commands
+                print(act, "command not recognized")
+
+                #While true loop to send commands to the connected client
+'''CURRENTLY INACCESSIBLE'''
+def send_comms(conn):
+    while True:
+        try:
+            cmd = input()
+            if cmd == 'quit':
+                break
+            if len(str.encode(cmd)) > 0:
+                conn.send(str.encode(cmd))
+                client_response = str(conn.recv(20480),"utf-8")
+                print(client_response,end="")
+        except:
+            print("Error sending commands")
+            break
+

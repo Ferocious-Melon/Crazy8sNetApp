@@ -1,4 +1,7 @@
 import socket
+import json
+
+config=json.loads(open("config.json").read())
 
 #Create socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -6,7 +9,7 @@ print("Client socket has been created!")
 
 '''CHANGE THIS TO THE SERVER'S LOCAL IP ADDRESS'''
 host = '192.168.68.136' #Assign host device IP (found manually)
-port = None             #Set global port variable
+port = config["port"]             #Set global port variable
 
 codes = ('MSG', 'INP', 'EXT') #List of possible codes that can be received from server
 
